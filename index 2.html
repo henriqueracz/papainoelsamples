@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Piano</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f8f8f8; /* Light gray background */
+    }
+
+    #piano {
+      display: flex;
+      flex-wrap: wrap;
+      width: 80%; /* Adjust the width percentage based on your preference */
+      max-width: 600px; /* Adjust the maximum width for better responsiveness */
+      margin: 0 auto; /* Center the piano on the screen */
+    }
+
+    .key {
+      width: 50px;
+      height: 200px;
+      border: 1px solid #dcdcdc; /* Light gray border for keys */
+      cursor: pointer;
+      background-color: #f9f9f9; /* Light gray key color */
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .key:hover {
+      background-color: #e0e0e0; /* Slightly darker gray on hover */
+    }
+
+    .key.active {
+      transform: translateY(4px);
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.8);
+    }
+
+    .black-key {
+      background-color: #333; /* Dark gray for black keys */
+      height: 120px;
+      width: 30px;
+      margin-left: -15px;
+      margin-right: -15px;
+      position: relative;
+      z-index: 1;
+      cursor: pointer;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .black-key:hover {
+      background-color: #444; /* Slightly darker gray on hover for black keys */
+    }
+
+    .black-key.active {
+      transform: translateY(4px);
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div id="piano"></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const piano = document.getElementById("piano");
+
+      const keys = [
+        { note: "C4", sound: "c4.mp3", key: "a" },
+        { note: "C#4", sound: "c-sharp4.mp3", key: "w" },
+        { note: "D4", sound: "d4.mp3", key: "s" },
+        { note: "D#4", sound: "d-sharp4.mp3", key: "e" },
+        { note: "E4", sound: "e4.mp3", key: "d" },
+        { note: "F4", sound: "f4.mp3", key: "f" },
+        { note: "F#4", sound: "f-sharp4.mp3", key: "t" },
+        { note: "G4", sound: "g4.mp3", key: "g" },
+        { note: "G#4", sound: "g-sharp4.mp3", key: "y" },
+        { note: "A4", sound: "a4.mp3", key: "h" },
+        { note: "A#4", sound: "a-sharp4.mp3", key: "u" },
+        { note: "B4", sound: "b4.mp3", key: "j" },
+        { note: "C5", sound: "c5.mp3", key: "k" },
+      ];
+
+      keys.forEach((key) => {
+        const keyElement = document.createElement("div");
+        keyElement.className = key.note.includes("#") ? "key black-key" : "key";
+        keyElement.dataset.note = key.note;
+
+        keyElement.addEventListener("mousedown", () => playSound(key.sound));
+        keyElement.addEventListener("touchstart", () => playSound(key.sound));
+
+        keyElement.addEventListener("mouseup", stopSound);
+        keyElement.addEventListener("touchend", stopSound);
+
+        piano.appendChild(keyElement);
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key.toLowerCase() === key.key) {
+            playSound(key.sound);
+            keyElement.classList.add("active");
+          }
+        });
+
+        document.addEventListener("keyup", (event) => {
+          if (event.key.toLowerCase() === key.key) {
+            stopSound();
+            keyElement.classList.remove("active");
+          }
+        });
+
+        let audio;
+
+        function playSound(soundFile) {
+          if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+          audio = new Audio(`sounds/${soundFile}`);
+          audio.play();
+          keyElement.classList.add("active");
+        }
+
+        function stopSound() {
+          if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+          keyElement.classList.remove("active");
+        }
+      });
+    });
+
+
+
+
+
+  </script>
+</body>
+
+
+<!-- ... (your existing HTML) ... -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const piano = document.getElementById("piano");
+
+    const keys = [
+      // ... (your existing keys) ...
+    ];
+
+    // Preload audio files
+    const audioCache = {};
+    keys.forEach((key) => {
+      const audio = new Audio(`sounds/${key.sound}`);
+      audioCache[key.sound] = audio;
+    });
+
+    keys.forEach((key) => {
+      const keyElement = document.createElement("div");
+      keyElement.className = key.note.includes("#") ? "key black-key" : "key";
+      keyElement.dataset.note = key.note;
+
+      keyElement.addEventListener("mousedown", () => playSound(key.sound));
+      keyElement.addEventListener("touchstart", () => playSound(key.sound));
+
+      keyElement.addEventListener("mouseup", stopSound);
+      keyElement.addEventListener("touchend", stopSound);
+
+      piano.appendChild(keyElement);
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key.toLowerCase() === key.key) {
+          playSound(key.sound);
+          keyElement.classList.add("active");
+        }
+      });
+
+      document.addEventListener("keyup", (event) => {
+        if (event.key.toLowerCase() === key.key) {
+          stopSound();
+          keyElement.classList.remove("active");
+        }
+      });
+
+      function playSound(soundFile) {
+        const audio = audioCache[soundFile];
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.play();
+          keyElement.classList.add("active");
+        }
+      }
+
+      function stopSound() {
+        keyElement.classList.remove("active");
+      }
+    });
+  });
+</script>
+</body>
+</html>
+
